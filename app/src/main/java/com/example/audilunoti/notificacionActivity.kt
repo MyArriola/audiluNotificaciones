@@ -10,7 +10,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -69,7 +68,7 @@ class NotificacionActivity : AppCompatActivity() {
         }
         // si la version del dispositivo es mayor o igual al API 21, hace:
         val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-        val pendingIntent:PendingIntent = PendingIntent.getActivity(this, 0, intent, flag)
+        val pendingIntent:PendingIntent = PendingIntent.getActivity(this, 1, intent, flag)
 
         val notificacion = NotificationCompat.Builder(  this, canalId).also {
             it.setContentTitle("Audilu")
@@ -83,31 +82,11 @@ class NotificacionActivity : AppCompatActivity() {
         // prioridad para administrar la configuracion
         val notificationManager = NotificationManagerCompat.from(this)
         // si el permiso de la notificacion no fue aceptado hacer...
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) == PackageManager.PERMISSION_GRANTED){
-            //permiso no aceptado por el momento
-            //solicitar el permiso, que lo acepte, creo otro metodo
-            Toast.makeText(this,"Permisos aceptados", Toast.LENGTH_SHORT).show()
-        }else{
-            //permitir las notificaciones
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) != PackageManager.PERMISSION_GRANTED){
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY), 777 )
         }
         notificationManager.notify(notificacionId,notificacion)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == 777){ //nuestro permiso
-            // este if es cuando ya tenemos el permiso de las notificaciones, osea fue aceptado
-            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){// [0]=> ya que solo pusimos un permiso, el de las notificaciones
-                crearNotificacion()
-            } else{
-                //el perimiso no ha sido aceptado
-                Toast.makeText(this, "Permisos rechazados", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+
 }
