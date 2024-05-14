@@ -92,7 +92,6 @@ class NotificacionActivity : AppCompatActivity() {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY), 777 )
         }
         notificationManager.notify(notificacionId,notificacion)
-        //notificationManager.notify(notificacionId, notificacion)
     }
 
     override fun onRequestPermissionsResult(
