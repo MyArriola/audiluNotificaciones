@@ -35,11 +35,12 @@ class NotificacionActivity : AppCompatActivity() {
 
         val btnNoti = findViewById<AppCompatButton>(R.id.btnNotificacion)
         //binding.idBoton.setOnClickListener // cuando aprete el boton va a venir y realizar esto
+        crearCanalNotificacion()
+        //despues de evaluar q el android sea mayor al android 8:
+        //llamo a la funcion:
+        crearNotificacion()
         btnNoti.setOnClickListener {
             //va a llamar a la funcion.:
-            crearCanalNotificacion()
-            //despues de evaluar q el android sea mayor al android 8:
-            //llamo a la funcion:
             crearNotificacion()
 
         }
@@ -82,11 +83,9 @@ class NotificacionActivity : AppCompatActivity() {
         // prioridad para administrar la configuracion
         val notificationManager = NotificationManagerCompat.from(this)
         // si el permiso de la notificacion no fue aceptado hacer...
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) != PackageManager.PERMISSION_GRANTED){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY), 777 )
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 777 )
         }
         notificationManager.notify(notificacionId,notificacion)
     }
-
-
 }
