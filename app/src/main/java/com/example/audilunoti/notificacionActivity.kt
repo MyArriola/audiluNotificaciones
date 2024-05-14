@@ -4,16 +4,13 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -21,13 +18,13 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.audilunoti.databinding.ActivityNotificacionBinding
 
-class notificacionActivity : AppCompatActivity() {
+class NotificacionActivity : AppCompatActivity() {
     // crear una variable privada la cual solo se va a poder usar en esta clase
     private lateinit var binding: ActivityNotificacionBinding
     //definir un canal
-    private val CANAL_NOMBRE = "canalNotificaciones"
+    private val canalNombre = "canalNotificaciones"
     //definir el canalid
-    private val CANAL_ID ="canalId"
+    private val canalId ="canalId"
     private val notificacionId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,19 +51,19 @@ class notificacionActivity : AppCompatActivity() {
     private fun crearCanalNotificacion(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){ //si la version del dispositivo es mayor a Android 8:
             //creo un canal de importancia
-            val CANAL_IMPORTANCIA = NotificationManager.IMPORTANCE_HIGH
+            val canalImportancia = NotificationManager.IMPORTANCE_HIGH
             //creo una variable para el canal
-            val CANAL = NotificationChannel(CANAL_ID,CANAL_NOMBRE, CANAL_IMPORTANCIA)
+            val canal = NotificationChannel(canalId,canalNombre, canalImportancia)
             //creo una variable para el administrador:
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(CANAL)
+            manager.createNotificationChannel(canal)
         }
     }
 
     //creo una funcion para las notificacion
     private fun crearNotificacion(){
         // permite ingresar a la aplicacion desde la notificacion
-        val intent = Intent(this, notificacionActivity::class.java).apply {
+        val intent = Intent(this, NotificacionActivity::class.java).apply {
             //esto permite que no se creen diversas pestañas cuando seleccionemos la notificacion
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -74,7 +71,7 @@ class notificacionActivity : AppCompatActivity() {
         val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         val pendingIntent:PendingIntent = PendingIntent.getActivity(this, 0, intent, flag)
 
-        val notificacion = NotificationCompat.Builder(  this, CANAL_ID).also {
+        val notificacion = NotificationCompat.Builder(  this, canalId).also {
             it.setContentTitle("Audilu")
             it.setContentText("Su bebé esta inquieto")
             it.setSmallIcon(R.drawable.logoaudilu2png)
