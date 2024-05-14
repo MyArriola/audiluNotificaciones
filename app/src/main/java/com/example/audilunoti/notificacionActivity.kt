@@ -1,0 +1,117 @@
+package com.example.audilunoti
+
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import com.example.audilunoti.databinding.ActivityNotificacionBinding
+
+class notificacionActivity : AppCompatActivity() {
+    // crear una variable privada la cual solo se va a poder usar en esta clase
+    private lateinit var binding: ActivityNotificacionBinding
+    //definir un canal
+    private val CANAL_NOMBRE = "canalNotificaciones"
+    //definir el canalid
+    private val CANAL_ID ="canalId"
+    private val notificacionId = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_notificacion)
+        //insertar esto para que funcione
+        binding = ActivityNotificacionBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        val btnNoti = findViewById<AppCompatButton>(R.id.btnNotificacion)
+        //binding.idBoton.setOnClickListener // cuando aprete el boton va a venir y realizar esto
+        btnNoti.setOnClickListener {
+            //va a llamar a la funcion.:
+            crearCanalNotificacion()
+            //despues de evaluar q el android sea mayor al android 8:
+            //llamo a la funcion:
+            crearNotificacion()
+
+        }
+    }
+
+//FUNCIONES PARA LAS NOTIFICACIONES
+    //verifica la version de android en el que se este utilizando sea MAYOR A ANDROID 8
+    private fun crearCanalNotificacion(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){ //si la version del dispositivo es mayor a Android 8:
+            //creo un canal de importancia
+            val CANAL_IMPORTANCIA = NotificationManager.IMPORTANCE_HIGH
+            //creo una variable para el canal
+            val CANAL = NotificationChannel(CANAL_ID,CANAL_NOMBRE, CANAL_IMPORTANCIA)
+            //creo una variable para el administrador:
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(CANAL)
+        }
+    }
+
+    //creo una funcion para las notificacion
+    private fun crearNotificacion(){
+        // permite ingresar a la aplicacion desde la notificacion
+        val intent = Intent(this, notificacionActivity::class.java).apply {
+            //esto permite que no se creen diversas pestañas cuando seleccionemos la notificacion
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        // si la version del dispositivo es mayor o igual al API 21, hace:
+        val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        val pendingIntent:PendingIntent = PendingIntent.getActivity(this, 0, intent, flag)
+
+        val notificacion = NotificationCompat.Builder(  this, CANAL_ID).also {
+            it.setContentTitle("Audilu")
+            it.setContentText("Su bebé esta inquieto")
+            it.setSmallIcon(R.drawable.logoaudilu2png)
+            it.priority = NotificationCompat.PRIORITY_HIGH
+            it.setContentIntent(pendingIntent)
+            it.setAutoCancel(true)
+        }.build()
+
+        // prioridad para administrar la configuracion
+        val notificationManager = NotificationManagerCompat.from(this)
+        // si el permiso de la notificacion no fue aceptado hacer...
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) == PackageManager.PERMISSION_GRANTED){
+            //permiso no aceptado por el momento
+            //solicitar el permiso, que lo acepte, creo otro metodo
+            Toast.makeText(this,"Permisos aceptados", Toast.LENGTH_SHORT).show()
+        }else{
+            //permitir las notificaciones
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY), 777 )
+        }
+        notificationManager.notify(notificacionId,notificacion)
+        //notificationManager.notify(notificacionId, notificacion)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == 777){ //nuestro permiso
+            // este if es cuando ya tenemos el permiso de las notificaciones, osea fue aceptado
+            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){// [0]=> ya que solo pusimos un permiso, el de las notificaciones
+                crearNotificacion()
+            } else{
+                //el perimiso no ha sido aceptado
+                Toast.makeText(this, "Permisos rechazados", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
