@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">audiluNoti</string>
+    <string name="notif">notificaciones</string>
 </resources>
